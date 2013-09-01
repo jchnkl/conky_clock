@@ -6,7 +6,10 @@ This clock is designed to resemble the swiss railway clock:
 
 [Wikipedia article](https://en.wikipedia.org/wiki/Swiss_railway_clock)
 
-[Animated gif](https://upload.wikimedia.org/wikipedia/de/7/7c/Minutensprunguhr_animiert.gif)
+[Animated gif](https://upload.wikimedia.org/wikipedia/de/7/7c/Minutensprunguhr_animiert.gif):
+
+<img src="https://upload.wikimedia.org/wikipedia/de/7/7c/Minutensprunguhr_animiert.gif"
+  alt="Animated gif of railway clock" width="150" height="150" />
 
 From the wikipedia article:
 > [..]
