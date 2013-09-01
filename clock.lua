@@ -100,7 +100,7 @@ function conky_clock()
   -- Settings
 
   local update_interval = conky_info["update_interval"]
-  local draw_seconds = update_interval <= 1
+  local draw_seconds = not (update_interval > 1)
 
   local clock_r = math.min(w,h) / 2
 
