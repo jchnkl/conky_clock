@@ -1,19 +1,29 @@
 --[[
-Air Clock by Alison Pitt (2009)
+  A conky clock by Jochen Keil (2013)
+  based upon Alison Pitt's Air Clock (2009)
 
-This clock is designed to look like KDE 4.3's "Air" clock, but from inside Conky.
+  This clock is designed to resemble the swiss railway clock:
 
-You can adjust the clock's radius and placement, as well as the size and offset
-of the drop shadow. You can also choose whether to display the seconds hand.
-This clock updates every time Conky does, so if you want to show seconds, it is
-recommended that you set update_interval to no more than 0.5s. If you turn off
-seconds, you can set the update_interval to as long as 30s.  The settings are in
-the "Settings" section, starting at Line 21.
+  https://en.wikipedia.org/wiki/Swiss_railway_clock
+  https://upload.wikimedia.org/wikipedia/de/7/7c/Minutensprunguhr_animiert.gif
 
-Call this script in Conky using the following before TEXT (assuming you save this script to ~/scripts/clock.lua):
-lua_load ~/scripts/clock.lua
-lua_draw_hook_pre draw_clock
-]]
+  From the wikipedia article:
+  [..]
+  The second hand is driven by an electrical motor independent of the
+  master clock. It requires only about 58.5 seconds to circle the face, then the
+  hand pauses briefly at the top of the clock. It starts a new rotation as soon
+  as it receives the next minute impulse from the master clock
+  [..]
+
+  This clock also rotates smoothly without "ticks".
+  It will also stop on top for a configureable delay (look out for the global delay value)
+
+  The main drawback is resource usage. For smooth circulation, conky needs to be
+  updated every 0.1 second. Therefore I strongly recommend to run this in
+  a seperate conky process.
+  Additionally, if the update_interval is larger than 1 the seconds hand is not
+  drawn. Hence, to save battery set update_interval_on_battery to 30 or so.
+--]]
 
 require 'cairo'
 require 'socket'
