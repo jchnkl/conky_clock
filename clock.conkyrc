@@ -18,7 +18,7 @@ conky.config = {
   draw_borders = false,
   double_buffer = true,
 
-  lua_load = '~/dotfiles/.config/conky/clock.lua',
+  lua_load = 'clock.lua',
   lua_shutdown_hook = 'shutdown',
   lua_draw_hook_pre = 'clock',
 
