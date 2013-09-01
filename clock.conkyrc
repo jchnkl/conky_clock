@@ -1,0 +1,27 @@
+conky.config = {
+  update_interval = 0.1,
+  update_interval_on_battery = 30,
+
+  own_window = true,
+  own_window_type = 'normal',
+  own_window_title = 'conky_clock',
+  own_window_argb_visual = true,
+  own_window_transparent = true,
+
+  minimum_width = 300,
+  minimum_height = 300,
+  alignment = 'top_left',
+
+  background = false,
+  draw_shades = false,
+  draw_outline = false,
+  draw_borders = false,
+  double_buffer = true,
+
+  lua_load = '~/dotfiles/.config/conky/clock.lua',
+  lua_shutdown_hook = 'shutdown',
+  lua_draw_hook_pre = 'clock',
+
+};
+
+conky.text = [[]];
