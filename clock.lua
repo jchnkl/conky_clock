@@ -18,6 +18,7 @@ lua_draw_hook_pre draw_clock
 require 'cairo'
 require 'socket'
 
+delay = 2
 surface = nil
 
 function init(window)
@@ -101,7 +102,6 @@ function conky_clock()
   local update_interval = conky_info["update_interval"]
   local draw_seconds = update_interval <= 1
 
-  local wait = 2
   local clock_r = math.min(w,h) / 2
 
   local xc=w/2
@@ -115,10 +115,10 @@ function conky_clock()
 
   local fac = 1 / update_interval
   local secs_arc = 2 * math.pi *
-  (((secs + socket.gettime() - os.date("%s")) * fac) / ((60 - wait) * fac))
+  (((secs + socket.gettime() - os.date("%s")) * fac) / ((60 - delay) * fac))
 
-  if (secs_arc >= 0 or secs_arc <= (2 * math.pi) * (wait/60))
-    and tonumber(secs) >= (60 - wait) then
+  if (secs_arc >= 0 or secs_arc <= (2 * math.pi) * (delay/60))
+    and tonumber(secs) >= (60 - delay) then
     secs_arc = 0
   end
 
