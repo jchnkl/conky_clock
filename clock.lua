@@ -232,9 +232,8 @@ function conky_clock()
   if not (update_interval > 1) then
     local secs_arc = 2 * math.pi * (secs + sub_secs) / (60 - delay)
 
-    if (secs_arc >= 0 or secs_arc <= (2 * math.pi) * (delay/60))
-      and tonumber(secs) >= (60 - delay) then
-      secs_arc = 0
+      if (secs_arc > 2 * math.pi) then secs_arc = 0 end
+
       sub_secs = sub_secs + update_interval
     end
 
