@@ -39,6 +39,8 @@ surface_hours_hand = nil
 surface_minutes_hand = nil
 surface_seconds_hand = nil
 
+last_secs = 60
+
 function init(window)
   surface_bg = cairo_image_surface_create(CAIRO_FORMAT_ARGB32,
                                           window.width, window.height)
@@ -202,9 +204,9 @@ function conky_clock()
   local xc=w/2
   local yc=h/2
 
-  local secs=os.date("%S")
+  local secs = os.date("%S")
 
-  if tonumber(secs) == 0 or first_run then
+  if last_secs > tonumber(secs) then
     local mins=os.date("%M")
     local mins_arc=(2*math.pi/60)*mins
     draw_minutes(xc, yc, clock_r, mins_arc)
@@ -213,6 +215,8 @@ function conky_clock()
     local hours_arc=(2*math.pi/12)*hours+mins_arc/12
     draw_hours(xc, yc, clock_r, hours_arc)
   end
+
+  last_secs = tonumber(secs)
 
   cairo_set_source_surface(cr, surface_bg, 0, 0)
   cairo_paint(cr)
