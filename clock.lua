@@ -35,18 +35,31 @@ delay = 2
 background_color = { 1, 1, 1, 1 }
 
 surface_bg = nil
+surface_hours_hand = nil
+surface_minutes_hand = nil
+surface_seconds_hand = nil
 
 function init(window)
   surface_bg = cairo_image_surface_create(CAIRO_FORMAT_ARGB32,
                                           window.width, window.height)
+  surface_hours_hand = cairo_image_surface_create(CAIRO_FORMAT_ARGB32,
+                                                  window.width, window.height)
+  surface_minutes_hand = cairo_image_surface_create(CAIRO_FORMAT_ARGB32,
+                                                    window.width, window.height)
+  surface_seconds_hand = cairo_image_surface_create(CAIRO_FORMAT_ARGB32,
+                                                    window.width, window.height)
+
   local cr = cairo_create(surface_bg)
-  draw_marks(cr, window.width / 2, window.height / 2,
+  draw_marks(window.width / 2, window.height / 2,
              math.min(window.width, window.height) / 2)
   cairo_destroy(cr)
 end
 
 function conky_shutdown()
   cairo_surface_destroy(surface_bg)
+  cairo_surface_destroy(surface_hours_hand)
+  cairo_surface_destroy(surface_minutes_hand)
+  cairo_surface_destroy(surface_seconds_hand)
 end
 
 function draw_marks(cr, xc, yc, clock_r)
@@ -91,6 +104,48 @@ function draw_marks(cr, xc, yc, clock_r)
   end
 end
 
+function draw_hours(xc, yc, clock_r, hours_arc)
+  local hours_cr = cairo_create(surface_hours_hand)
+
+  local xbegin=xc+(clock_r * -0.24)*math.sin(hours_arc)
+  local ybegin=yc-(clock_r * -0.24)*math.cos(hours_arc)
+  local xend=xc+(clock_r * 0.672)*math.sin(hours_arc)
+  local yend=yc-(clock_r * 0.672)*math.cos(hours_arc)
+
+  cairo_set_operator(hours_cr, CAIRO_OPERATOR_CLEAR)
+  cairo_paint(hours_cr)
+  cairo_set_operator(hours_cr, CAIRO_OPERATOR_SOURCE);
+
+  cairo_move_to(hours_cr,xbegin,ybegin)
+  cairo_line_to(hours_cr,xend,yend)
+
+  cairo_set_line_width(hours_cr,clock_r * 0.11)
+  cairo_stroke(hours_cr)
+
+  cairo_destroy(hours_cr)
+end
+
+function draw_minutes(xc, yc, clock_r, mins_arc)
+  local mins_cr = cairo_create(surface_minutes_hand)
+
+  local xbegin=xc+(clock_r * -0.25)*math.sin(mins_arc)
+  local ybegin=yc-(clock_r * -0.25)*math.cos(mins_arc)
+  local xend=xc+(clock_r * 0.94)*math.sin(mins_arc)
+  local yend=yc-(clock_r * 0.94)*math.cos(mins_arc)
+
+  cairo_set_operator(mins_cr, CAIRO_OPERATOR_CLEAR)
+  cairo_paint(mins_cr)
+  cairo_set_operator(mins_cr, CAIRO_OPERATOR_SOURCE);
+
+  cairo_move_to(mins_cr,xbegin,ybegin)
+  cairo_line_to(mins_cr,xend,yend)
+
+  cairo_set_line_width(mins_cr,clock_r * 0.08)
+  cairo_stroke(mins_cr)
+
+  cairo_destroy(mins_cr)
+end
+
 function conky_clock()
   if conky_window == nil then
     return
@@ -98,7 +153,8 @@ function conky_clock()
     return
   end
 
-  if surface_bg == nil then init(conky_window) end
+  local first_run = surface_bg == nil
+  if first_run then init(conky_window) end
 
   local w = conky_window.width
   local h = conky_window.height
@@ -109,9 +165,6 @@ function conky_clock()
                                        w, h)
 
   local cr = cairo_create(cs)
-
-  cairo_set_source_surface(cr, surface_bg, 0, 0)
-  cairo_paint(cr)
 
   -- Settings
 
@@ -138,36 +191,27 @@ function conky_clock()
     secs_arc = 0
   end
 
-  mins_arc=(2*math.pi/60)*mins
-  hours_arc=(2*math.pi/12)*hours+mins_arc/12
-
   -- Draw hour hand
 
-  xbegin=xc+(clock_r * -0.24)*math.sin(hours_arc)
-  ybegin=yc-(clock_r * -0.24)*math.cos(hours_arc)
-  xend=xc+(clock_r * 0.672)*math.sin(hours_arc)
-  yend=yc-(clock_r * 0.672)*math.cos(hours_arc)
+  if secs/10 == 0 or first_run then
 
-  cairo_move_to(cr,xbegin,ybegin)
-  cairo_line_to(cr,xend,yend)
+    local mins_arc=(2*math.pi/60)*mins
+    draw_minutes(xc, yc, clock_r, mins_arc)
 
-  cairo_set_line_cap(cr,CAIRO_LINE_CAP_BUTT)
-  cairo_set_line_width(cr,clock_r * 0.11)
-  cairo_set_source_rgba(cr,0.0,0,0,1.0)
-  cairo_stroke(cr)
+    local hours_arc=(2*math.pi/12)*hours+mins_arc/12
+    draw_hours(xc, yc, clock_r, hours_arc)
+  end
+
+  cairo_set_source_surface(cr, surface_bg, 0, 0)
+  cairo_paint(cr)
+
+  cairo_set_source_surface(cr, surface_hours_hand, 0, 0)
+  cairo_paint(cr)
 
   -- Draw minute hand
 
-  xbegin=xc+(clock_r * -0.25)*math.sin(mins_arc)
-  ybegin=yc-(clock_r * -0.25)*math.cos(mins_arc)
-  xend=xc+(clock_r * 0.94)*math.sin(mins_arc)
-  yend=yc-(clock_r * 0.94)*math.cos(mins_arc)
-
-  cairo_move_to(cr,xbegin,ybegin)
-  cairo_line_to(cr,xend,yend)
-
-  cairo_set_line_width(cr,clock_r * 0.08)
-  cairo_stroke(cr)
+  cairo_set_source_surface(cr, surface_minutes_hand, 0, 0)
+  cairo_paint(cr)
 
   -- Draw seconds hand
 
