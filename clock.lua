@@ -229,12 +229,18 @@ function conky_clock()
   cairo_set_source_surface(cr, surface_minutes_hand, 0, 0)
   cairo_paint(cr)
 
-  if not (update_interval > 1) then
-    local secs_arc = 2 * math.pi * (secs + sub_secs) / (60 - delay)
+  if update_interval <= 1 then
+    local secs_arc = 0
+
+    if (update_interval < 1) then
+      secs_arc = 2 * math.pi * (secs + sub_secs) / (60 - delay)
 
       if (secs_arc > 2 * math.pi) then secs_arc = 0 end
 
       sub_secs = sub_secs + update_interval
+
+    elseif update_interval == 1 then
+      secs_arc = 2 * math.pi * ((secs + delay) / 60)
     end
 
     cairo_translate(cr, xc, yc)
@@ -242,6 +248,7 @@ function conky_clock()
     cairo_translate(cr, -xc, -yc)
     cairo_set_source_surface(cr, surface_seconds_hand, 0, 0)
     cairo_paint(cr)
+
   end
 
   cairo_destroy(cr)
