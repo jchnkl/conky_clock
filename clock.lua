@@ -28,6 +28,7 @@
 require 'cairo'
 require 'socket'
 
+-- how long to pause the seconds hand
 delay = 2
 
 -- r, g, b, a
