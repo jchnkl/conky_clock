@@ -202,18 +202,14 @@ function conky_clock()
   local xc=w/2
   local yc=h/2
 
-  -- Grab time
-
-  local hours=os.date("%I")
-  local mins=os.date("%M")
   local secs=os.date("%S")
 
-
-  if secs/10 == 0 or first_run then
-
+  if tonumber(secs) == 0 or first_run then
+    local mins=os.date("%M")
     local mins_arc=(2*math.pi/60)*mins
     draw_minutes(xc, yc, clock_r, mins_arc)
 
+    local hours=os.date("%I")
     local hours_arc=(2*math.pi/12)*hours+mins_arc/12
     draw_hours(xc, yc, clock_r, hours_arc)
   end
