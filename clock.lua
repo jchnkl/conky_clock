@@ -230,9 +230,7 @@ function conky_clock()
   cairo_paint(cr)
 
   if not (update_interval > 1) then
-    local fac = 1 / update_interval
-    local secs_arc = 2 * math.pi *
-      (((secs + sub_secs) * fac) / ((60 - delay) * fac))
+    local secs_arc = 2 * math.pi * (secs + sub_secs) / (60 - delay)
 
     if (secs_arc >= 0 or secs_arc <= (2 * math.pi) * (delay/60))
       and tonumber(secs) >= (60 - delay) then
