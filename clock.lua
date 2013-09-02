@@ -49,10 +49,8 @@ function init(window)
   surface_seconds_hand = cairo_image_surface_create(CAIRO_FORMAT_ARGB32,
                                                     window.width, window.height)
 
-  local cr = cairo_create(surface_bg)
   draw_marks(window.width / 2, window.height / 2,
              math.min(window.width, window.height) / 2)
-  cairo_destroy(cr)
 end
 
 function conky_shutdown()
@@ -62,7 +60,9 @@ function conky_shutdown()
   cairo_surface_destroy(surface_seconds_hand)
 end
 
-function draw_marks(cr, xc, yc, clock_r)
+function draw_marks(xc, yc, clock_r)
+  local cr = cairo_create(surface_bg)
+
   local minutes_len = clock_r * 0.075
   local minutes_thick = clock_r * 0.025
   local minutes_color = { 0.0, 0, 0, 1.0 }
@@ -102,6 +102,8 @@ function draw_marks(cr, xc, yc, clock_r)
     cairo_set_source_rgba(cr,r,g,b,a)
     cairo_stroke(cr)
   end
+
+  cairo_destroy(cr)
 end
 
 function draw_hours(xc, yc, clock_r, hours_arc)
