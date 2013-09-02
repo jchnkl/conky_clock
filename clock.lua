@@ -29,19 +29,19 @@ require 'cairo'
 require 'socket'
 
 delay = 2
-surface = nil
+surface_bg = nil
 
 function init(window)
-  surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32,
-                                       window.width, window.height)
-  local cr = cairo_create(surface)
+  surface_bg = cairo_image_surface_create(CAIRO_FORMAT_ARGB32,
+                                          window.width, window.height)
+  local cr = cairo_create(surface_bg)
   draw_marks(cr, window.width / 2, window.height / 2,
              math.min(window.width, window.height) / 2)
   cairo_destroy(cr)
 end
 
 function conky_shutdown()
-  cairo_surface_destroy(surface)
+  cairo_surface_destroy(surface_bg)
 end
 
 function draw_marks(cr, xc, yc, clock_r)
@@ -92,7 +92,7 @@ function conky_clock()
     return
   end
 
-  if surface == nil then init(conky_window) end
+  if surface_bg == nil then init(conky_window) end
 
   local w = conky_window.width
   local h = conky_window.height
@@ -104,7 +104,7 @@ function conky_clock()
 
   local cr = cairo_create(cs)
 
-  cairo_set_source_surface(cr, surface, 0, 0)
+  cairo_set_source_surface(cr, surface_bg, 0, 0)
   cairo_paint(cr)
 
   -- Settings
