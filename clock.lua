@@ -26,7 +26,6 @@
 --]]
 
 require 'cairo'
-require 'socket'
 
 -- how long to pause the seconds hand
 delay = 2
@@ -39,6 +38,7 @@ surface_hours_hand = nil
 surface_minutes_hand = nil
 surface_seconds_hand = nil
 
+sub_secs = 0
 last_secs = 60
 
 function init(window)
@@ -206,6 +206,8 @@ function conky_clock()
 
   local secs = os.date("%S")
 
+  if not (last_secs == tonumber(secs)) then sub_secs = 0 end
+
   if last_secs > tonumber(secs) then
     local mins=os.date("%M")
     local mins_arc=(2*math.pi/60)*mins
@@ -230,11 +232,12 @@ function conky_clock()
   if not (update_interval > 1) then
     local fac = 1 / update_interval
     local secs_arc = 2 * math.pi *
-      (((secs + socket.gettime() - os.date("%s")) * fac) / ((60 - delay) * fac))
+      (((secs + sub_secs) * fac) / ((60 - delay) * fac))
 
     if (secs_arc >= 0 or secs_arc <= (2 * math.pi) * (delay/60))
       and tonumber(secs) >= (60 - delay) then
       secs_arc = 0
+      sub_secs = sub_secs + update_interval
     end
 
     cairo_translate(cr, xc, yc)
