@@ -29,6 +29,10 @@ require 'cairo'
 require 'socket'
 
 delay = 2
+
+-- r, g, b, a
+background_color = (1, 1, 1, 1)
+
 surface_bg = nil
 
 function init(window)
@@ -54,7 +58,8 @@ function draw_marks(cr, xc, yc, clock_r)
   local hours_color = { 0.0, 0, 0, 1.0 }
   local steps = 360/60
 
-  cairo_set_source_rgba(cr,1,1,1,1)
+  local r,g,b,a = unpack(background_color)
+  cairo_set_source_rgba(cr, r, g, b, a)
   cairo_arc(cr, xc, yc, clock_r, 0, 2 * math.pi)
   cairo_fill(cr)
 
