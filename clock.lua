@@ -49,6 +49,9 @@ function init(window)
   surface_seconds_hand = cairo_image_surface_create(CAIRO_FORMAT_ARGB32,
                                                     window.width, window.height)
 
+  draw_seconds_hand(window.width / 2, window.height / 2,
+                    math.min(window.width, window.height) / 2)
+
   draw_marks(window.width / 2, window.height / 2,
              math.min(window.width, window.height) / 2)
 end
@@ -148,6 +151,28 @@ function draw_minutes(xc, yc, clock_r, mins_arc)
   cairo_destroy(mins_cr)
 end
 
+function draw_seconds_hand(xc, yc, clock_r)
+  local secs_cr = cairo_create(surface_seconds_hand)
+
+  local xbegin=xc
+  local ybegin=yc-(clock_r * -0.34)
+  local xend=xc
+  local yend=yc-(clock_r * 0.65)
+
+  cairo_set_source_rgba(secs_cr,1.0,0.0,0.0,1.0)
+
+  cairo_move_to(secs_cr,xbegin,ybegin)
+  cairo_line_to(secs_cr,xend,yend)
+
+  cairo_set_line_width(secs_cr,clock_r * 0.025)
+  cairo_stroke(secs_cr)
+
+  cairo_arc(secs_cr, xend, yend, clock_r * 0.105, 0, 2 * math.pi)
+  cairo_fill(secs_cr)
+
+  cairo_destroy(secs_cr)
+end
+
 function conky_clock()
   if conky_window == nil then
     return
@@ -171,7 +196,6 @@ function conky_clock()
   -- Settings
 
   local update_interval = conky_info["update_interval"]
-  local draw_seconds = not (update_interval > 1)
 
   local clock_r = math.min(w,h) / 2
 
@@ -184,16 +208,6 @@ function conky_clock()
   local mins=os.date("%M")
   local secs=os.date("%S")
 
-  local fac = 1 / update_interval
-  local secs_arc = 2 * math.pi *
-  (((secs + socket.gettime() - os.date("%s")) * fac) / ((60 - delay) * fac))
-
-  if (secs_arc >= 0 or secs_arc <= (2 * math.pi) * (delay/60))
-    and tonumber(secs) >= (60 - delay) then
-    secs_arc = 0
-  end
-
-  -- Draw hour hand
 
   if secs/10 == 0 or first_run then
 
@@ -210,31 +224,24 @@ function conky_clock()
   cairo_set_source_surface(cr, surface_hours_hand, 0, 0)
   cairo_paint(cr)
 
-  -- Draw minute hand
-
   cairo_set_source_surface(cr, surface_minutes_hand, 0, 0)
   cairo_paint(cr)
 
-  -- Draw seconds hand
+  if not (update_interval > 1) then
+    local fac = 1 / update_interval
+    local secs_arc = 2 * math.pi *
+      (((secs + socket.gettime() - os.date("%s")) * fac) / ((60 - delay) * fac))
 
-  if draw_seconds then
-    cairo_set_source_rgba(cr,1.0,0.0,0.0,1.0)
+    if (secs_arc >= 0 or secs_arc <= (2 * math.pi) * (delay/60))
+      and tonumber(secs) >= (60 - delay) then
+      secs_arc = 0
+    end
 
-    xbegin=xc+(clock_r * -0.34)*math.sin(secs_arc)
-    ybegin=yc-(clock_r * -0.34)*math.cos(secs_arc)
-    xend=xc+(clock_r * 0.65)*math.sin(secs_arc)
-    yend=yc-(clock_r * 0.65)*math.cos(secs_arc)
-
-    cairo_move_to(cr,xbegin,ybegin)
-    cairo_line_to(cr,xend,yend)
-
-    cairo_set_line_width(cr,clock_r * 0.025)
-    cairo_stroke(cr)
-
-    cairo_arc(cr, xend, yend, clock_r * 0.105, 0, 2 * math.pi)
-    cairo_fill(cr)
-
-    cairo_stroke(cr)
+    cairo_translate(cr, xc, yc)
+    cairo_rotate(cr, secs_arc)
+    cairo_translate(cr, -xc, -yc)
+    cairo_set_source_surface(cr, surface_seconds_hand, 0, 0)
+    cairo_paint(cr)
   end
 
   cairo_destroy(cr)
