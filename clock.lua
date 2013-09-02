@@ -32,7 +32,7 @@ require 'socket'
 delay = 2
 
 -- r, g, b, a
-background_color = (1, 1, 1, 1)
+background_color = { 1, 1, 1, 1 }
 
 surface_bg = nil
 
